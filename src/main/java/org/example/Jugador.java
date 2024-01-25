@@ -3,66 +3,45 @@ package org.example;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Jugador {
-    //atributos
-    private int x;
-    private int y;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-    //lsita de observadores
-    private List<Observador> observadores;
+public class Jugador extends Coordenadas {
+    // Lista observable de las posiciones del jugador
+    private ObservableList<Coordenadas> posiciones;
 
-    //constructor
+    // Constructor
     public Jugador(int x, int y) {
-        this.x = x;
-        this.y = y;
-        this.observadores = new ArrayList<>();
+        super(x, y); // Llama al constructor de Coordenadas
+        this.posiciones = FXCollections.observableArrayList();
+        this.posiciones.add(new Coordenadas(x, y)); // Agrega la posición inicial
     }
 
-    //metodo para mover al jugador
+    // Método para mover al jugador
     public void mover(char direccion) {
         switch (direccion) {
-            case 'a': // izquierda
-                x--;
+            case 'a': // Izquierda
+                deltaX(-1);
                 break;
-            case 'd': // derecha
-                x++;
+            case 'd': // Derecha
+                deltaX(1);
                 break;
-            case 'w': // arriba
-                y--;
+            case 'w': // Arriba
+                deltaY(-1);
                 break;
-            case 's': // abajo
-                y++;
+            case 's': // Abajo
+                deltaY(1);
                 break;
         }
-        System.out.println("Nueva posición del jugador: (" + x + ", " + y + ")");
-        notificarObservadores();//cada vez que el jugador se mueva se notificara a los observadores
+        System.out.println("Nueva posición del jugador: (" + getX() + ", " + getY() + ")");
+        posiciones.add(new Coordenadas(getX(), getY())); // Agrega la nueva posición
     }
 
-    //metodo para agregar observadores
-    public void agregarObservador(Observador observador) {
-        observadores.add(observador);
+    // Método para obtener la lista de posiciones
+    public ObservableList<Coordenadas> getPosiciones() {
+        return posiciones;
     }
-
-    //metodo para notificar a los observadores
-    public void notificarObservadores() {
-        for (Observador observador : observadores) {
-            observador.actualizar(x, y);
-        }
-    }
-
-    //metodo para obtener la lista de observadores
-    public List<Observador> getObservadores() {
-        return observadores;
-    }
-
-    // Métodos getters para x e y
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-
 }
+
+
+

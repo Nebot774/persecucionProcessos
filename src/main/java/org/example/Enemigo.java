@@ -1,38 +1,39 @@
 package org.example;
 
-public class Enemigo implements Observador {
-    private int x;
-    private int y;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 
-    public Enemigo(int x, int y) {
-        this.x = x;
-        this.y = y;
+public class Enemigo extends Coordenadas implements ListChangeListener<Coordenadas> {
+
+    public Enemigo(int startX, int startY) {
+        super(startX, startY);
     }
 
-    //metodo para actualizar la posicion del enemigo
+    public void followPlayer(ObservableList<Coordenadas> playerPositions) {
+        playerPositions.addListener(this);
+    }
+
     @Override
-    public void actualizar(int jugadorX, int jugadorY) {
-        // Decidimos en qué dirección nos moveremos para acercarnos al jugador
-        int deltaX = jugadorX - x;
-        int deltaY = jugadorY - y;
-
-        // Se movera en la dirección X si la distancia en X es mayor que en Y
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            x += Integer.signum(deltaX) * 2; // Moverse 2 pasos hacia el jugador en el eje X
-        } else {
-            y += Integer.signum(deltaY) * 2; // Moverse 2 pasos hacia el jugador en el eje Y
+    public void onChanged(Change<? extends Coordenadas> change) {
+        while (change.next()) {
+            if (change.wasAdded()) {
+                Coordenadas newPlayerPosition = change.getAddedSubList().get(0);
+                moveToPlayer(newPlayerPosition);
+                System.out.println("Enemigo se ha movido a: (" + getX() + "," + getY() + ")");
+            }
         }
-
-        System.out.println("Nueva posición del enemigo: (" + x + ", " + y + ")");
     }
 
-    // Métodos getters para x e y
-    public int getX() {
-        return x;
-    }
+    private void moveToPlayer(Coordenadas playerPosition) {
+        // Implementa la lógica para mover al enemigo hacia el jugador
+        int deltaX = playerPosition.getX() - this.getX();
+        int deltaY = playerPosition.getY() - this.getY();
 
-    public int getY() {
-        return y;
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            deltaX(Integer.signum(deltaX)); // Moverse un paso en X
+        } else if (deltaY != 0) {
+            deltaY(Integer.signum(deltaY)); // Moverse un paso en Y
+        }
     }
 }
 

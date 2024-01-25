@@ -5,15 +5,13 @@ import java.util.Random;
 import java.util.Scanner;
 
 
-import java.util.Random;
-import java.util.Scanner;
+import javafx.collections.ObservableList;
 
 public class Main {
     public static void main(String[] args) {
         partida();
     }
 
-    //metodo para iniciar i jugar la partida
     public static void partida() {
         Random random = new Random();
         Scanner scanner = new Scanner(System.in);
@@ -22,11 +20,9 @@ public class Main {
         // Generar posición inicial para el jugador
         jugadorX = random.nextInt(31);
         jugadorY = random.nextInt(31);
-
-        //creamos el jugador
         Jugador jugador = new Jugador(jugadorX, jugadorY);
 
-        // Creamos y agregamos tres enemigos
+        // Suscribir enemigos a las posiciones del jugador
         for (int i = 0; i < 3; i++) {
             int enemigoX, enemigoY;
             do {
@@ -34,10 +30,8 @@ public class Main {
                 enemigoY = random.nextInt(31);
             } while (Math.abs(jugadorX - enemigoX) + Math.abs(jugadorY - enemigoY) < 5);
 
-            //creamos el enemigo con sus posiciones y lo añadimos al array de observadores
             Enemigo enemigo = new Enemigo(enemigoX, enemigoY);
-            jugador.agregarObservador(enemigo);
-
+            jugador.getPosiciones().addListener(enemigo);
             System.out.println("Posición inicial del enemigo " + (i+1) + ": (" + enemigoX + ", " + enemigoY + ")");
         }
 
@@ -53,19 +47,19 @@ public class Main {
                 char movimiento = input.charAt(0);
                 if (movimiento == 'a' || movimiento == 'd' || movimiento == 'w' || movimiento == 's') {
                     jugador.mover(movimiento);
-                    //Despues de cada movimiento Verificar si alguno de los enemigos ha atrapado al jugador
-                    for (Observador observador : jugador.getObservadores()) {
-                        Enemigo enemigo = (Enemigo) observador;
-                        atrapado = (jugador.getX() == enemigo.getX()) && (jugador.getY() == enemigo.getY());
-                        if (atrapado) {
+                    // Comprobar si el jugador ha sido atrapado después de cada movimiento
+                    ObservableList<Coordenadas> posiciones = jugador.getPosiciones();
+                    Coordenadas ultimaPosicion = posiciones.get(posiciones.size() - 1);
+                    for (Enemigo enemigo : jugador.getPosiciones().getListeners(Enemigo.class)) {
+                        if (ultimaPosicion.getX() == enemigo.getX() && ultimaPosicion.getY() == enemigo.getY()) {
                             System.out.println("¡Jugador atrapado por el enemigo!");
+                            atrapado = true;
                             break;
                         }
                     }
-                    if (atrapado) break;
                 }
             }
-        } while (!input.equals("q") && !atrapado);//si es atrapado o el jugador pulsa q se acaba el juego
+        } while (!input.equals("q") && !atrapado);
 
         scanner.close();
         System.out.println("Juego terminado.");
