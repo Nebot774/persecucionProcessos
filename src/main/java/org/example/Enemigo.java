@@ -24,15 +24,18 @@ public class Enemigo extends Coordenadas implements ListChangeListener<Coordenad
         }
     }
 
+
     private void moveToPlayer(Coordenadas playerPosition) {
         // Implementa la lógica para mover al enemigo hacia el jugador
-        int deltaX = playerPosition.getX() - this.getX();
-        int deltaY = playerPosition.getY() - this.getY();
+        for (int i = 0; i < 2; i++) { // Moverse dos veces
+            int deltaX = playerPosition.getX() - this.getX();
+            int deltaY = playerPosition.getY() - this.getY();
 
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            deltaX(Integer.signum(deltaX)); // Moverse un paso en X
-        } else if (deltaY != 0) {
-            deltaY(Integer.signum(deltaY)); // Moverse un paso en Y
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                deltaX(Integer.signum(deltaX)); // Moverse un paso en X
+            } else if (deltaY != 0) {
+                deltaY(Integer.signum(deltaY)); // Moverse un paso en Y
+            }
         }
     }
 }

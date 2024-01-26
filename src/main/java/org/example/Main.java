@@ -7,6 +7,10 @@ import java.util.Scanner;
 
 import javafx.collections.ObservableList;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class Main {
     public static void main(String[] args) {
         partida();
@@ -22,7 +26,10 @@ public class Main {
         jugadorY = random.nextInt(31);
         Jugador jugador = new Jugador(jugadorX, jugadorY);
 
-        // Suscribir enemigos a las posiciones del jugador
+        // Lista para almacenar los enemigos
+        List<Enemigo> enemigos = new ArrayList<>();
+
+        // Crear y agregar enemigos
         for (int i = 0; i < 3; i++) {
             int enemigoX, enemigoY;
             do {
@@ -32,6 +39,8 @@ public class Main {
 
             Enemigo enemigo = new Enemigo(enemigoX, enemigoY);
             jugador.getPosiciones().addListener(enemigo);
+            enemigos.add(enemigo); // Añadir el enemigo a la lista
+
             System.out.println("Posición inicial del enemigo " + (i+1) + ": (" + enemigoX + ", " + enemigoY + ")");
         }
 
@@ -47,15 +56,10 @@ public class Main {
                 char movimiento = input.charAt(0);
                 if (movimiento == 'a' || movimiento == 'd' || movimiento == 'w' || movimiento == 's') {
                     jugador.mover(movimiento);
-                    // Comprobar si el jugador ha sido atrapado después de cada movimiento
-                    ObservableList<Coordenadas> posiciones = jugador.getPosiciones();
-                    Coordenadas ultimaPosicion = posiciones.get(posiciones.size() - 1);
-                    for (Enemigo enemigo : jugador.getPosiciones().getListeners(Enemigo.class)) {
-                        if (ultimaPosicion.getX() == enemigo.getX() && ultimaPosicion.getY() == enemigo.getY()) {
-                            System.out.println("¡Jugador atrapado por el enemigo!");
-                            atrapado = true;
-                            break;
-                        }
+                    // Comprobar si algún enemigo ha atrapado al jugador
+                    atrapado = enemigos.stream().anyMatch(enemigo -> jugador.getX() == enemigo.getX() && jugador.getY() == enemigo.getY());
+                    if (atrapado) {
+                        System.out.println("¡Jugador atrapado por el enemigo!");
                     }
                 }
             }
@@ -65,6 +69,7 @@ public class Main {
         System.out.println("Juego terminado.");
     }
 }
+
 
 
 
